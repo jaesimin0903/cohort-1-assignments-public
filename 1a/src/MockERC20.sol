@@ -7,11 +7,17 @@ import {IMockERC20} from "./IMockERC20.sol";
 // Add as many variables or functions as you would like
 // for the implementation. The goal is to pass `forge test`.
 contract MockERC20 is ERC20, IMockERC20 {
-    constructor(string memory name_, string memory symbol_) ERC20(name_, symbol_) {}
+    constructor(string memory name_, string memory symbol_) ERC20(name_, symbol_) {
+        // Remove initial mint to avoid issues with msg.sender in tests
+    }
 
     // Implement
-    function freeMintTo(uint256 amount, address to) external {}
+    function freeMintTo(uint256 amount, address to) external {
+        _mint(to, amount);
+    }
 
     // Implement
-    function freeMintToSender(uint256 amount) external {}
+    function freeMintToSender(uint256 amount) external {
+        _mint(msg.sender, amount);
+    }
 }
