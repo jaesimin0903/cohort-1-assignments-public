@@ -21810,3 +21810,11 @@ ERR_NGROK_3200
 2025-09-09T12:07:38.452 application=ethereum_jsonrpc [info] URL "http://geth:8545/" of http type is available now, switching back from fallback urls
 2025-09-09T12:07:41.181 application=ethereum_jsonrpc [warning] URL "http://geth:8545/" is unavailable, and there is no other http url available, switching to fallback http url
 2025-09-09T12:07:41.467 application=ethereum_jsonrpc [info] URL "http://geth:8545/" of http type is available now, switching back from fallback urls
+2025-09-09T12:07:44.221 application=ethereum_jsonrpc [warning] URL "http://geth:8545/" is unavailable, and there is no other http url available, switching to fallback http url
+2025-09-09T12:07:44.475 application=ethereum_jsonrpc [info] URL "http://geth:8545/" of http type is available now, switching back from fallback urls
+2025-09-09T12:07:47.253 application=ethereum_jsonrpc [warning] URL "http://geth:8545/" is unavailable, and there is no other http url available, switching to fallback http url
+2025-09-09T12:07:47.486 application=ethereum_jsonrpc [info] URL "http://geth:8545/" of http type is available now, switching back from fallback urls
+2025-09-09T12:07:50.293 application=ethereum_jsonrpc [warning] URL "http://geth:8545/" is unavailable, and there is no other http url available, switching to fallback http url
+2025-09-09T12:07:50.495 application=ethereum_jsonrpc [info] URL "http://geth:8545/" of http type is available now, switching back from fallback urls
+2025-09-09T12:07:53.319 application=ethereum_jsonrpc [warning] URL "http://geth:8545/" is unavailable, and there is no other http url available, switching to fallback http url
+2025-09-09T12:07:53.513 application=ethereum_jsonrpc [info] URL "http://geth:8545/" of http type is available now, switching back from fallback urls
