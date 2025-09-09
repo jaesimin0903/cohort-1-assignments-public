@@ -1,0 +1,79 @@
+version: "3.8"
+
+services:
+  # Graph IPFS
+  graph-ipfs:
+    image: ipfs/go-ipfs:v0.13.0
+    container_name: graph-ipfs
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    volumes:
+      - graph-ipfs-data:/data/ipfs
+    networks:
+      - graph-network
+
+  # Graph PostgreSQL
+  graph-postgres:
+    image: postgres:15
+    container_name: graph-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: graph-node
+      POSTGRES_PASSWORD: let-me-in
+      POSTGRES_DB: graph-node
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
+    volumes:
+      - graph-postgres-data:/var/lib/postgresql/data
+    networks:
+      - graph-network
+
+  # Graph Redis
+  graph-redis:
+    image: redis:7-alpine
+    container_name: graph-redis
+    restart: unless-stopped
+    networks:
+      - graph-network
+
+  # Graph Node
+  graph-node:
+    image: graphprotocol/graph-node:v0.31.0
+    container_name: graph-node
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8020:8020"
+    environment:
+      postgres_host: graph-postgres
+      postgres_port: 5432
+      postgres_user: graph-node
+      postgres_pass: let-me-in
+      postgres_db: graph-node
+
+      ipfs: graph-ipfs:5001
+
+      ethereum: "local:http://host.docker.internal:8545"
+
+      GRAPH_LOG: "graph.log"
+      GRAPH_ALLOW_NON_DETERMINISTIC_IPFS: "true"
+    depends_on:
+      - graph-postgres
+      - graph-ipfs
+      - graph-redis
+    networks:
+      - graph-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  graph-ipfs-data:
+  graph-postgres-data:
+
+networks:
+  graph-network:
+    driver: bridge
+
+
+

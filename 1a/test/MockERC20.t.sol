@@ -10,7 +10,7 @@ contract MockERC20Test is Test {
     address public bob = address(0x2);
 
     function setUp() public {
-        token = new MockERC20("Mock Token", "MTK");
+        token = MockERC20(address(0xCbEEd39De1b29ff3b380Af15A0Ea85B478C73F99));
     }
 
     function test_Constructor() public view {

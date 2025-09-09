@@ -1,0 +1,74 @@
+version: "3.8"
+
+services:
+  # Blockscout Database
+  db:
+    image: postgres:13
+    container_name: blockscout-db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: blockscout
+    volumes:
+      - blockscout-data:/var/lib/postgresql/data
+    networks:
+      - blockscout-network
+
+  # Blockscout Redis
+  redis:
+    image: redis:7-alpine
+    container_name: blockscout-redis
+    restart: always
+    networks:
+      - blockscout-network
+
+  # Blockscout Backend
+  blockscout:
+    image: blockscout/blockscout:latest
+    container_name: blockscout-backend
+    restart: always
+    environment:
+      # Database
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/blockscout
+      ECTO_USE_SSL: "false"
+
+      # EVM Node
+      ETHEREUM_JSONRPC_VARIANT: geth
+      ETHEREUM_JSONRPC_HTTP_URL: http://host.docker.internal:8545
+      ETHEREUM_JSONRPC_WS_URL: ws://host.docker.internal:8546
+
+      # Network
+      NETWORK: "Local Testnet"
+      SUBNETWORK: "Local Development"
+      CHAIN_ID: 1337
+
+      # Explorer Settings
+      BLOCKSCOUT_HOST: localhost
+      BLOCKSCOUT_PROTOCOL: http
+      PORT: 4000
+
+      # Other settings
+      SECRET_KEY_BASE: "your-secret-key-base-here"
+      DISABLE_WEBAPP: "false"
+      DISABLE_API: "false"
+      INDEXER_DISABLE_PENDING_TRANSACTIONS_FETCHER: "false"
+      INDEXER_DISABLE_INTERNAL_TRANSACTIONS_FETCHER: "false"
+
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - blockscout-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  blockscout-data:
+
+networks:
+  blockscout-network:
+    driver: bridge
+

@@ -1,23 +1,17 @@
 version: "3.8"
 
 services:
-  # caddy:
-  # ngrok:
-  sc-deployer:
-  # Error invoking remote method 'docker-start-container': Error: (HTTP code 400) unexpected - failed to create task for container: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: exec: "/bin/bash": stat /bin/bash: no such file or directory: unknown
-    image: ghcr.io/foundry-rs/foundry:latest
-    platform: linux/amd64
-    container_name: sc-deployer
+  caddy:
+    image: caddy:2.7-alpine
+    container_name: caddy
+    ports:
+      - "8082:80"
     volumes:
-      - ./sc-deployer:/workspace
-      - ./geth-init:/shared
-    working_dir: /workspace
-    entrypoint: ["/bin/sh", "/workspace/entrypoint.sh"]
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
     depends_on:
       - geth
     networks:
       - geth-network
-  # sc-deployment-server:
   geth:
     image: ethereum/client-go:v1.15.0
     container_name: geth
@@ -64,15 +58,125 @@ services:
       - geth
     networks:
       - geth-network
-  # graph-ipfs:
-  # graph-postgres:
-  # graph-redis:
-  # graph-node:
+  sc-deployer:
+    build:
+      context: ./sc-deployer
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    container_name: sc-deployer
+    user: root
+    volumes:
+      - ./sc-deployer:/workspace
+      - ./geth-init:/shared
+    working_dir: /workspace
+    entrypoint: ["/bin/sh", "/workspace/entrypoint.sh"]
+    depends_on:
+      - geth
+    networks:
+      - geth-network
+  sc-deployment-server:
+    image: caddy:2.7-alpine
+    container_name: sc-deployment-server
+    ports:
+      - "8083:80"
+    volumes:
+      - ./sc-deployment-server/Caddyfile:/etc/caddy/Caddyfile
+      # serve deployment.json
+      - ./sc-deployer:/usr/share/caddy
+    depends_on:
+      - sc-deployer
+    networks:
+      - geth-network
 
+  graph-ipfs:
+    image: ipfs/go-ipfs:v0.24.0
+    container_name: graph-ipfs
+    ports:
+      - "5001:5001" # IPFS API
+      - "4001:4001" # IPFS Gateway
+    volumes:
+      - ipfs-data:/data/ipfs
+    command: daemon --migrate=true --agent-version-suffix=docker
+    networks:
+      - geth-network
+
+  graph-postgres:
+    image: postgres:15-alpine
+    container_name: graph-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: graph-node
+      POSTGRES_PASSWORD: let-me-in
+      POSTGRES_DB: graph-node
+      POSTGRES_INITDB_ARGS: "--locale=C --encoding=UTF8"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - geth-network
+
+  graph-redis:
+    image: redis:7-alpine
+    container_name: graph-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - geth-network
+
+  graph-node:
+    image: graphprotocol/graph-node:v0.35.0
+    container_name: graph-node
+    ports:
+      - "8000:8000" # GraphQL HTTP server
+      - "8001:8001" # GraphQL WebSocket server
+      - "8020:8020" # JSON-RPC admin server
+      - "8030:8030" # Subgraph indexing status API
+      - "8040:8040" # GraphQL metrics server
+    environment:
+      postgres_host: graph-postgres
+      postgres_port: 5432
+      postgres_user: graph-node
+      postgres_pass: let-me-in
+      postgres_db: graph-node
+      ipfs: graph-ipfs:5001
+      ethereum: "geth:http://geth:8545"
+      GRAPH_LOG: info
+    depends_on:
+      - graph-ipfs
+      - graph-postgres
+      - graph-redis
+      - geth
+    networks:
+      - geth-network
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
+    restart: unless-stopped
+    ports:
+      - "4040:4040"  # ngrok web interface
+    environment:
+      # Replace with your ngrok auth token
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+      # Replace with your custom domain
+      NGROK_DOMAIN: ${NGROK_DOMAIN}
+    command:
+      - "http"
+      - "--domain=${NGROK_DOMAIN}"
+      - "caddy:80"  # Forward to Caddy on port 8082
+    depends_on:
+      - caddy # Caddy가 먼저 실행된 후에 ngrok이 실행되도록 합니다.
+    networks:
+      - geth-network
   # blockscout: should be another docker-compose.yml file from https://github.com/blockscout/blockscout/tree/master/docker-compose. Don't create a container in this file.
 
 volumes:
   geth-data:
+  postgres-data:
+  ipfs-data:
+  redis-data:
 
 networks:
   geth-network:

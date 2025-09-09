@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
+    restart: unless-stopped
+    ports:
+      - "4040:4040"  # ngrok web interface
+    environment:
+      # Replace with your ngrok auth token
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+      # Replace with your custom domain
+      NGROK_DOMAIN: ${NGROK_DOMAIN}
+    command:
+      - "http"
+      - "proxy:80"  # Forward to Blockscout proxy directly
+    networks:
+      - geth-network
+
+networks:
+  geth-network:
+    external: true
+    name: geth-network
+

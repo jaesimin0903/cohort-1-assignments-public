@@ -8,3 +8,9 @@ libs = ["lib"]
 remappings = [
     "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/"
 ]
+
+[rpc_endpoints]
+local = "http://geth:8545"
+
+[etherscan]
+local = { key = "", url = "http://geth:8545" }
