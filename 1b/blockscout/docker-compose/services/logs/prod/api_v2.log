@@ -6643,3 +6643,7 @@
 2025-09-09T12:07:44.394 application=api_v2 request_id=GGOb36EBOmhyWqIAAS4B [info] Sent 501 in 171µs on GET /api/v2/proxy/account-abstraction/status?
 2025-09-09T12:07:49.426 application=api_v2 request_id=GGOb4MvZ7Q7eJE0AAJIn [info] Sent 200 in 17ms on GET /api/v2/main-page/indexing-status?
 2025-09-09T12:07:49.429 application=api_v2 request_id=GGOb4M0f__2O7XcAAJJH [info] Sent 501 in 79µs on GET /api/v2/proxy/account-abstraction/status?
+2025-09-09T12:07:54.459 application=api_v2 request_id=GGOb4fgX5PYpNCEAATDB [info] Sent 200 in 13ms on GET /api/v2/main-page/indexing-status?
+2025-09-09T12:07:54.464 application=api_v2 request_id=GGOb4fk87JZ5zl4AATDh [info] Sent 501 in 147µs on GET /api/v2/proxy/account-abstraction/status?
+2025-09-09T12:07:59.483 application=api_v2 request_id=GGOb4yOw1IB9jWoAAJRH [info] Sent 200 in 11ms on GET /api/v2/main-page/indexing-status?
+2025-09-09T12:07:59.489 application=api_v2 request_id=GGOb4yTGCs_fWpUAAJRn [info] Sent 501 in 64µs on GET /api/v2/proxy/account-abstraction/status?
